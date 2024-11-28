@@ -317,3 +317,23 @@ header a {
 	text-decoration: underline black;
 	color: black;
 }
+
+/*Personnalisation de la page en mode edition*/
+.mode-edition{
+	width: 1440px;
+	background-color: black;
+	display: flex;
+    flex-direction: row;
+    justify-content: center;
+	padding: 20px 0;
+	gap: 10px;
+}
+.mode-edition p{
+	font-family: 'Work Sans' ;
+	font-size: 16px;
+	font-weight: 400;
+}
+
+.white{
+	color: white;
+}

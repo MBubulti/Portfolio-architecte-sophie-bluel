@@ -88,3 +88,32 @@ btnTriHotels.addEventListener("click", function(){
   )
   projetsGallery(projetsFiltreHotels);
 })
+
+//Affichage page selon présence du token  - PENSER A DELETE DU STORAGE LE TOKEN  QUAND ON FERME/QUITTE OU LOGOUT
+const token = localStorage.getItem("token");
+console.log('token présent')
+console.log(token)
+console.log(token !== undefined && token !== null)
+
+//IF qui permet les modifications en vérifiant le statut non null & undefined du token
+if (token !== undefined && token !== null){
+  //Transformation du mot login en logout
+  const logModif = document.querySelector(".log");
+  logModif.innerHTML = "logout"
+
+  //Création de la barre mode édition
+  const barreEdition = document.querySelector("body");
+  let divBarreEdition = document.createElement("div");
+  const texteEdition = document.createElement("p");
+  let iconeEdition = document.createElement("i");
+  iconeEdition.classList.add("fa-regular", "fa-pen-to-square", "white");
+  texteEdition.classList.add("white");
+  texteEdition.innerText = "Mode édition"
+  divBarreEdition.classList.add("mode-edition");
+  divBarreEdition = barreEdition.insertBefore(divBarreEdition, document.querySelector("header"));
+  divBarreEdition.appendChild(iconeEdition);
+  divBarreEdition.appendChild(texteEdition);
+  
+  //Ajout du bouton modifier
+  
+}
