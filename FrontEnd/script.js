@@ -20,7 +20,7 @@ function projetsGallery(Filtre){
     const imgProjet = document.createElement("img");
     imgProjet.src = travaux.imageUrl
     const titreProjet = document.createElement("figcaption");
-    titreProjet.innerHTML = travaux.title 
+    titreProjet.innerText = travaux.title 
     divProjets.appendChild(figuresProjet);
     figuresProjet.appendChild(imgProjet);
     figuresProjet.appendChild(titreProjet);
