@@ -220,7 +220,7 @@ label {
 	font-size: 16px;
 }
 
-input[type="submit"]{
+#contact input[type="submit"], .tableau-connexion input[type="submit"]{
 	font-family: 'Syne';
 	color: white;
 	background-color: #1D6154;
@@ -355,4 +355,102 @@ header a {
 	gap: 10px;
 	text-decoration: none;
 	color: black;
+}
+
+/*Ajout de la modale*/
+
+/*Gestion affichage de la modale*/
+.fond-modale{
+	display: none;
+	position: fixed;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	background-color: rgba(0, 0, 0, 0.3);
+}
+
+.modale{
+	display: none;
+	width: 630px;
+	height: 688px;
+	position: absolute;
+	top: 85%;
+	left: 35%;
+	background-color: white;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	border-radius: 10px;
+}
+
+.active{
+	display: flex;
+}
+
+.icones{
+	display: flex;
+	flex-direction: row;
+	width: 560px;
+	justify-content: flex-end;
+}
+
+h3{
+	font-size: 26px;
+}
+
+.fa-xmark{
+	font-size: 24px;
+}
+
+/*Gestion affichage photo Modale*/
+.photo-modale{
+	height: 102px;
+	width: 76px;
+}
+
+.galerie-photo{
+	display: flex;
+	flex-direction: row;
+	flex-wrap: wrap;
+	width: 420px;
+	column-gap: 10px;
+	row-gap: 30px;
+	margin-top: 50px;
+	margin-bottom: 30px;
+	padding-bottom: 30px;
+	border-bottom: solid #B3B3B3 1px;
+}
+
+.ajout-photo{
+	font-family: 'Syne';
+	color: white;
+	background-color: #1D6154;
+	height: 36px;
+	width: 237px;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	border-radius: 60px ;
+	border: none;
+	box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
+}
+
+.fa-corbeille{
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	background-color: black;
+	color: white;
+	width: 17px;
+	height: 17px;
+	font-size: 10px;
+	border-radius: 2px;
+	position: relative;
+	top: -80%;
+	left: 70%;
+}
+
+.cacher{
+	display: none;
 }

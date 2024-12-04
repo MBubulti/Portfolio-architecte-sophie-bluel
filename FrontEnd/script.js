@@ -6,7 +6,6 @@ const projets = await appelApiProjets.json();
 const appelApiCategories = await fetch("http://localhost:5678/api/categories/");
 const categories = await appelApiCategories.json();
 
-//Affichage page selon présence du token  - PENSER A DELETE DU STORAGE LE TOKEN  QUAND ON FERME/QUITTE OU LOGOUT
 //Récupération du token en localStorage
 const token = localStorage.getItem("token");
 
@@ -16,13 +15,20 @@ categories.sort(function (a, b) {
   return a.id - b.id;
 });
 
+// *** Mode Edition & Token ***//
+//Affichage page selon présence du token  - PENSER A DELETE DU STORAGE LE TOKEN  QUAND ON FERME/QUITTE OU LOGOUT
 //Fonction qui vérifie localement l'expiration du token
-function tokenExpiration(token){
-  if(!token){
+function tokenValidation(token){
+  const payload = tokenExpiration(token);
+  if(!payload){
     return null;
   }
-  //Découpe du token en 3 élément, et sélection du payload
+  return payload
+}
+
+function tokenExpiration(token){
   try{
+      //Découpe du token en 3 élément, et sélection du payload
     const tokenPayload = token.split(".")[1];
     const payload = JSON.parse(atob(tokenPayload));
     //Déclaration d'une const  qui est le temps actuel en secondes
@@ -39,7 +45,7 @@ function tokenExpiration(token){
   }
 }
 
-const tokenVerifie = tokenExpiration(token);
+const tokenVerifie = tokenValidation(token);
 
 //If qui permet avec la vérification du token l'affichage spécifique
 if (tokenVerifie !== null) {
@@ -149,3 +155,115 @@ projetsGallery(projets);
 filtresCategories(categories);
 
 filtrerProjets();
+
+//Modale
+
+const fondModale = document.querySelector(".fond-modale");
+const modale = document.querySelector(".modale");
+const btnModification = document.querySelector(".div-titre a");
+
+//Fonction pour générer l'affichage de tous les projets en modale
+function projetsModale(filtre) {
+  // Récupération de l'élément DOM qui accueille la figure
+  const divProjets = document.querySelector(".galerie-photo");
+  divProjets.innerHTML = "";
+  for (let i = 0; i < filtre.length; i++) {
+    const travaux = filtre[i];
+    // Création d'une figure dédiée aux projets
+    const figuresProjet = document.createElement("figure");
+    figuresProjet.dataset.id = travaux.id;
+    //Création des éléments de la figure
+    const imgProjet = document.createElement("img");
+    imgProjet.src = travaux.imageUrl;
+    imgProjet.classList.add("photo-modale");
+    const corbeille = document.createElement("i");
+    corbeille.classList.add("fa-solid", "fa-trash-can", "fa-corbeille");
+    divProjets.appendChild(figuresProjet);
+    figuresProjet.appendChild(imgProjet);
+    figuresProjet.appendChild(corbeille);
+  }
+}
+
+//Fonction qui génére la modale galerie photo
+function modaleGalerie(){
+  //Initialiser les différents éléments dans la modale
+  const divModale = document.querySelector(".modale");
+  const placementModale = document.querySelector(".form-photo");
+  //Vérifier que le contenu n'existe pas déjà
+  if(divModale.querySelector("h3")){
+    //S'assurer de réafficher la galerie sur la modale
+    const galeriePhoto = document.querySelector(".galerie-photo");
+    galeriePhoto.classList.remove("cacher");
+    const inputPhoto = document.querySelector(".form-photo");
+    inputPhoto.classList.add("cacher");
+    return;
+  }
+  else{
+ //Générer le contenu
+ const titreModale = document.createElement("h3");
+ titreModale.innerText = "Galerie photo";
+ const divGalerie = document.createElement("div");
+ divGalerie.classList.add("galerie-photo");
+ const inputPhoto = document.querySelector(".form-photo");
+ inputPhoto.classList.add("cacher");
+ //Attribution des éléments
+ divModale.insertBefore(titreModale, placementModale);
+ divModale.insertBefore(divGalerie, placementModale);
+  }
+  
+}
+
+//Permet l'affichage de la modale
+btnModification.addEventListener("click", function(event){
+  event.preventDefault();
+  fondModale.classList.add("active");
+  modale.classList.add("active");
+  modaleGalerie();
+  projetsModale(projets);
+})
+
+//Fonction qui clôt la modale
+function fermerModale(){
+  fondModale.classList.remove("active");
+  modale.classList.remove("active");
+}
+
+//Permet le désaffichage de la modale en cliquant sur l'arrière plan
+fondModale.addEventListener("click", fermerModale);
+
+//Permet le désaffichage de la modale en cliquant sur la croix
+const croixFermer = document.querySelector(".fa-xmark");
+croixFermer.addEventListener("click", fermerModale);
+
+//Switch affichage modale au click sur "Ajouter une photo"
+const switchModale = document.querySelector(".ajout-photo");
+switchModale.addEventListener("click", function(){
+  modale.classList
+})
+
+////////EN COURS
+//Fonction pour ajouter en option les catégories
+function selectCategorie(){
+  categories
+}
+
+
+//Passage de  la modale en mode Ajout Photo
+const ajoutPhoto = document.querySelector(".ajout-photo")
+ajoutPhoto.addEventListener("click", function(){
+  const divModale = document.querySelector(".modale");
+  //Changer  le h3
+  const titreModale =  document.querySelector(".modale h3");
+  titreModale.innerText = "Ajout photo";
+  //Cacher la galerie photo
+  const galeriePhoto = document.querySelector(".galerie-photo");
+  galeriePhoto.classList.add("cacher");
+  //Afficher  input, titre, catégorie
+  const inputPhoto = document.querySelector(".form-photo");
+  inputPhoto.classList.remove("cacher");
+
+  //Générer les catégories dans le select
+
+})
+////////
+
