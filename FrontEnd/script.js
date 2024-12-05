@@ -16,7 +16,6 @@ categories.sort(function (a, b) {
 });
 
 // *** Mode Edition & Token ***//
-//Affichage page selon présence du token  - PENSER A DELETE DU STORAGE LE TOKEN  QUAND ON FERME/QUITTE OU LOGOUT
 //Fonction qui vérifie localement l'expiration du token
 function tokenValidation(token){
   const payload = tokenExpiration(token);
@@ -25,6 +24,12 @@ function tokenValidation(token){
   }
   return payload
 }
+
+//Suppression du token en cas de click sur logout
+const logSupprToken = document.querySelector(".log");
+logSupprToken.addEventListener("click", function(){
+  token = localStorage.removeItem("token");
+})
 
 function tokenExpiration(token){
   try{
@@ -257,7 +262,6 @@ function SupprimerTravaux(){
       const figSuppression =  event.target.closest("figure");
       //Récupère le data-id de la figure sélectionnée, ? permet d'éviter une erreur dans le  cas où  il n'y a pas de parent
       const idSuppression = figSuppression?.getAttribute("data-id");
-      console.log(idSuppression);
  
       //Envoyer la requêtre DELETE pour supprimer l'élément
       try{
@@ -304,7 +308,6 @@ function selectCategorie(){
   barreSelect.innerHTML = '<option value=""></option>';
   for (let i = 1; i < categories.length; i++){
     const optionFiltre = categories[i];
-    const valeurOption = optionFiltre.id;
     const option = document.createElement("option");
     option.value =  optionFiltre.id;
     option.innerText =  optionFiltre.name;
@@ -333,18 +336,7 @@ function viderFormulaire(){
 function recupererTravail(){
   //Récupération informations formulaire au click du bouton valider
     //Récupération PHOTO
-    let photo = undefined;
-    let photoURL = undefined;
-    depotPhoto.addEventListener("change", function (event) {
-      const photoTravail = event.target;
-      photo = photoTravail.files[0];
-      photoURL = URL.createObjectURL(photo);
-      if (photo) {
-        console.log("Fichier récupéré :", photoURL);
-      } else {
-        console.log("Aucun fichier n'a été sélectionné.");
-      }
-    });
+    let photo = document.getElementById("depot-photo").files[0];
     //Récupération TITRE
     const titre = document.querySelector("#titre-travail");
     const titreEnvoyer = titre.value.trim();
@@ -359,8 +351,9 @@ function recupererTravail(){
     const choix = selectChoix.options[choixIndex].value;
     const choixInt = parseInt(choix, 10);
 
+    //Déclaration du FormData pour  envoi à l'API
     const nouveauTravail = new FormData();
-    nouveauTravail.append("image", photoURL);
+    nouveauTravail.append("image", photo);
     nouveauTravail.append("title", titreEnvoyer);
     nouveauTravail.append("category", choixInt);
     return nouveauTravail
@@ -373,12 +366,9 @@ function recupererTravail(){
     try{
     const reponse = await fetch("http://localhost:5678/api/works/", {
             method: "POST",
-            body: nouveauTravail,
             headers: {Authorization: `Bearer ${token}`},
+            body: nouveauTravail,
           });
-      if(reponse.ok){
-      (projetsGallery(projets));
-      }
     }catch(error){
       alert("Problème rencontré", error);
     }
@@ -465,7 +455,9 @@ depotPhoto.addEventListener("change", function (event) {
 });
 
 //*** Envoi des informations à  l'API ***//
-btnAjoutPhoto.addEventListener("click", function(){
+btnAjoutPhoto.addEventListener("click", function(event){
+  event.preventDefault();
   envoyerTravail();
+  fermerModale();
+  projetsGallery(projets);
 })
-
