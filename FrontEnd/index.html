@@ -69,17 +69,25 @@
       <div class="fond-modale"></div>
       <div class="modale">
         <div class="icones">
-          <i class="fa-solid fa-xmark"></i>
+          <i class="fa-solid fa-arrow-left fa-icone"></i>
+          <i class="fa-solid fa-xmark fa-icone"></i>
         </div>
         <form action="#" method="post" class="form-photo">
-          <input type="file" class="input-photo" accept="image/jpeg, image/png">
-          <input type="text" name="titre" id="titre">
-          <label for="titre">Titre</label>
-          <select name="categorie" id="categorie">
+          <label for="depot-photo" class="zone-depot affiche-photo" id="zone-depot-photo">
+            <i class="fa-regular fa-image"></i>
+            <span>+ Ajouter photo</span>
+            <img   src="" class="affichage-photo cacher" alt="prévisualisation">
+            <p>jpg, png : 4mo max</p>
+            <input type="file" id="depot-photo" class="input-photo cacher" accept="image/jpeg, image/png" required>
+          </label>
+          <label for="titre-travail">Titre</label>
+          <input type="text" name="titre" id="titre-travail" minlength="3" required>
+          <label for="categorie">Catégorie</label>
+          <select name="categorie" id="categorie" required>
             <option value=""></option>
           </select>
-          <label for="categorie">Catégorie</label>
         </form>
+        <button type="submit" class="envoi">Valider</button>
         <div class="ajout-photo">Ajouter une photo</div>
       </div>
     </main>

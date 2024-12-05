@@ -161,6 +161,9 @@ filtrerProjets();
 const fondModale = document.querySelector(".fond-modale");
 const modale = document.querySelector(".modale");
 const btnModification = document.querySelector(".div-titre a");
+const ajoutPhoto = document.querySelector(".ajout-photo");
+const depotPhoto = document.getElementById("depot-photo");
+const btnAjoutPhoto = document.querySelector(".envoi");
 
 //Fonction pour générer l'affichage de tous les projets en modale
 function projetsModale(filtre) {
@@ -217,6 +220,7 @@ btnModification.addEventListener("click", function(event){
   event.preventDefault();
   fondModale.classList.add("active");
   modale.classList.add("active");
+  btnAjoutPhoto.classList.add("cacher")
   modaleGalerie();
   projetsModale(projets);
   SupprimerTravaux();
@@ -224,8 +228,17 @@ btnModification.addEventListener("click", function(event){
 
 //Fonction qui clôt la modale
 function fermerModale(){
+  const titreModale =  document.querySelector(".modale h3");
+  titreModale.innerText = "Galerie photo";
+  ajoutPhoto.innerText = "Ajouter une photo";
+  btnAjoutPhoto.classList.remove("activation");
+  ajoutPhoto.classList.remove("cacher");
+  const fleche = document.querySelector(".fa-arrow-left");
+  fleche.classList.remove("visible");
   fondModale.classList.remove("active");
   modale.classList.remove("active");
+  btnAjoutPhoto.classList.add("cacher");
+  viderFormulaire();
 }
 
 //Permet le désaffichage de la modale en cliquant sur l'arrière plan
@@ -234,12 +247,6 @@ fondModale.addEventListener("click", fermerModale);
 //Permet le désaffichage de la modale en cliquant sur la croix
 const croixFermer = document.querySelector(".fa-xmark");
 croixFermer.addEventListener("click", fermerModale);
-
-//Switch affichage modale au click sur "Ajouter une photo"
-const switchModale = document.querySelector(".ajout-photo");
-switchModale.addEventListener("click", function(){
-  modale.classList
-})
 
 function SupprimerTravaux(){
   const suppression = document.querySelectorAll(".fa-corbeille");
@@ -274,29 +281,191 @@ function SupprimerTravaux(){
   });
 }
 
-////////EN COURS
+//Permet le retour en arrière avec la fleche sur la modale
+const flecheRetour = document.querySelector(".fa-arrow-left");
+flecheRetour.addEventListener("click", function(){
+  const fleche = document.querySelector(".fa-arrow-left");
+  fleche.classList.remove("visible");
+  const titreModale =  document.querySelector(".modale h3");
+  titreModale.innerText = "Galerie photo";
+  ajoutPhoto.innerText = "Ajouter une photo";
+  const galeriePhoto = document.querySelector(".galerie-photo");
+  galeriePhoto.classList.remove("cacher");
+  const inputPhoto = document.querySelector(".form-photo");
+  inputPhoto.classList.add("cacher");
+  btnAjoutPhoto.classList.remove("activation");
+  btnAjoutPhoto.classList.add("cacher")
+  ajoutPhoto.classList.remove("cacher");
+});
+
 //Fonction pour ajouter en option les catégories
 function selectCategorie(){
-  categories
+  const barreSelect = document.querySelector("#categorie");
+  barreSelect.innerHTML = '<option value=""></option>';
+  for (let i = 1; i < categories.length; i++){
+    const optionFiltre = categories[i];
+    const valeurOption = optionFiltre.id;
+    const option = document.createElement("option");
+    option.value =  optionFiltre.id;
+    option.innerText =  optionFiltre.name;
+    barreSelect.appendChild(option);
+  }
 }
+
+// Vider le formulaire après envoi
+function viderFormulaire(){
+  const formulaire = document.querySelector(".form-photo");
+  if (formulaire) {
+    formulaire.reset();
+    const photoInput = formulaire.querySelector(".affichage-photo");
+    photoInput.src = "";
+    photoInput.classList.add("cacher");
+    const faImage = document.querySelector(".fa-image");
+    const labelSpan = document.querySelector(".zone-depot span");
+    const labelP = document.querySelector(".zone-depot p");
+    faImage.classList.remove("cacher");
+    labelSpan.classList.remove("cacher");
+    labelP.classList.remove("cacher");
+  }
+}
+
+//Fonction qui récupère les  informations
+function recupererTravail(){
+  //Récupération informations formulaire au click du bouton valider
+    //Récupération PHOTO
+    let photo = undefined;
+    let photoURL = undefined;
+    depotPhoto.addEventListener("change", function (event) {
+      const photoTravail = event.target;
+      photo = photoTravail.files[0];
+      photoURL = URL.createObjectURL(photo);
+      if (photo) {
+        console.log("Fichier récupéré :", photoURL);
+      } else {
+        console.log("Aucun fichier n'a été sélectionné.");
+      }
+    });
+    //Récupération TITRE
+    const titre = document.querySelector("#titre-travail");
+    const titreEnvoyer = titre.value.trim();
+    if (titreEnvoyer === "") {
+      alert("Votre titre n'est pas valide");
+    }
+    //Récupération SELECT
+    const selectChoix = document.getElementById("categorie");
+    //Récupérer l'index du select
+    const choixIndex = selectChoix.selectedIndex;
+    //Attribution value option choisie
+    const choix = selectChoix.options[choixIndex].value;
+    const choixInt = parseInt(choix, 10);
+
+    const nouveauTravail = new FormData();
+    nouveauTravail.append("image", photoURL);
+    nouveauTravail.append("title", titreEnvoyer);
+    nouveauTravail.append("category", choixInt);
+    return nouveauTravail
+  }
+  
+  //Fonction qui gère l'envoi du travail
+  async function envoyerTravail(){
+    const nouveauTravail = recupererTravail();
+    //Envoi via Fetch API
+    try{
+    const reponse = await fetch("http://localhost:5678/api/works/", {
+            method: "POST",
+            body: nouveauTravail,
+            headers: {Authorization: `Bearer ${token}`},
+          });
+      if(reponse.ok){
+      (projetsGallery(projets));
+      }
+    }catch(error){
+      alert("Problème rencontré", error);
+    }
+  };
 
 
 //Passage de  la modale en mode Ajout Photo
-const ajoutPhoto = document.querySelector(".ajout-photo")
 ajoutPhoto.addEventListener("click", function(){
-  const divModale = document.querySelector(".modale");
   //Changer  le h3
   const titreModale =  document.querySelector(".modale h3");
   titreModale.innerText = "Ajout photo";
+  //Changer le bouton
+  ajoutPhoto.classList.add("cacher");
+  btnAjoutPhoto.classList.remove("cacher")
   //Cacher la galerie photo
   const galeriePhoto = document.querySelector(".galerie-photo");
   galeriePhoto.classList.add("cacher");
   //Afficher  input, titre, catégorie
   const inputPhoto = document.querySelector(".form-photo");
   inputPhoto.classList.remove("cacher");
-
+  //Apparition élément  FA flèche
+  const fleche = document.querySelector(".fa-arrow-left");
+  fleche.classList.add("visible");
+  //Ajout effet grisé sur la  barre Valider
+  btnAjoutPhoto.classList.add("activation");
   //Générer les catégories dans le select
+  selectCategorie(categories);
+  verifierFormulaire();
+});
 
+function verifierFormulaire(){
+  const formulaire = document.querySelector(".form-photo");
+  const verificationForm = () => {
+    const valide = formulaire.checkValidity();
+    if(valide){
+      btnAjoutPhoto.classList.remove("activation");
+      ajoutPhoto.classList.add("envoi");
+    } else{
+      btnAjoutPhoto.classList.add("activation");
+    }
+  };
+  formulaire.addEventListener("input",verificationForm);
+  verificationForm();
+}
+
+
+//Afficher l'image ajoutée en input
+depotPhoto.addEventListener("change", function (event) {
+  //Récupérer l'image envoyée
+  const photoAjoutee = event.target;
+  const photo = photoAjoutee.files[0];
+
+  if (photo) {
+    // Crée une URL temporaire pour le fichier
+    const photoURL = URL.createObjectURL(photo); 
+    const imageAffichage = document.querySelector(".affichage-photo");
+
+    // Cache les différents éléments
+    const faImage = document.querySelector(".fa-image");
+    const labelSpan = document.querySelector(".zone-depot span");
+    const labelP = document.querySelector(".zone-depot p");
+    faImage.classList.add("cacher");
+    labelSpan.classList.add("cacher");
+    labelP.classList.add("cacher");
+
+    //Ajout d'une source à l'image
+    imageAffichage.classList.remove("cacher");
+    imageAffichage.src = photoURL;
+
+    // Libère l'URL temporaire lorsque l'image n'est plus nécessaire
+    imageAffichage.onload = () => URL.revokeObjectURL(photoURL);
+  } else {
+    // Si aucun fichier sélectionné, on cache l'image
+    imageAffichage.classList.add("cacher");
+    const imageAffichage = document.querySelector(".affichage-photo");
+    imageAffichage.src = "";
+    const faImage = document.querySelector(".fa-image");
+    const labelSpan = document.querySelector(".zone-depot span");
+    const labelP = document.querySelector(".zone-depot p");
+    faImage.classList.remove("cacher");
+    labelSpan.classList.remove("cacher");
+    labelP.classList.remove("cacher");
+  }
+});
+
+//*** Envoi des informations à  l'API ***//
+btnAjoutPhoto.addEventListener("click", function(){
+  envoyerTravail();
 })
-////////
 
