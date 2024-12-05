@@ -210,7 +210,6 @@ function modaleGalerie(){
  divModale.insertBefore(titreModale, placementModale);
  divModale.insertBefore(divGalerie, placementModale);
   }
-  
 }
 
 //Permet l'affichage de la modale
@@ -220,6 +219,7 @@ btnModification.addEventListener("click", function(event){
   modale.classList.add("active");
   modaleGalerie();
   projetsModale(projets);
+  SupprimerTravaux();
 })
 
 //Fonction qui clôt la modale
@@ -240,6 +240,39 @@ const switchModale = document.querySelector(".ajout-photo");
 switchModale.addEventListener("click", function(){
   modale.classList
 })
+
+function SupprimerTravaux(){
+  const suppression = document.querySelectorAll(".fa-corbeille");
+  //Récupère pour chaque i fa-corbeille le data id de sa fig
+  suppression.forEach(corbeille => {
+    corbeille.addEventListener("click",async (event)=>{
+      //Remonter l'arbre DOM pour trouver le  parent le plus proche de la corbeille
+      const figSuppression =  event.target.closest("figure");
+      //Récupère le data-id de la figure sélectionnée, ? permet d'éviter une erreur dans le  cas où  il n'y a pas de parent
+      const idSuppression = figSuppression?.getAttribute("data-id");
+      console.log(idSuppression);
+ 
+      //Envoyer la requêtre DELETE pour supprimer l'élément
+      try{
+        const reponse = await fetch(`http://localhost:5678/api/works/${idSuppression}`, {
+          method: "DELETE",
+          headers: {Authorization: `Bearer ${token}`},
+        });
+        if (reponse.ok){
+          figSuppression.remove();
+          const figGallery = document.querySelector(`.gallery figure[data-id="${idSuppression}"]`);
+          figGallery.remove();
+
+        } else{
+          alert("Travail non supprimé", reponse.statusText, reponse.status);
+        }
+      }
+      catch(error){
+        console.error("Problème rencontré", error);
+      }
+    });
+  });
+}
 
 ////////EN COURS
 //Fonction pour ajouter en option les catégories
