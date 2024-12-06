@@ -15,7 +15,7 @@ categories.sort(function (a, b) {
   return a.id - b.id;
 });
 
-// *** Mode Edition & Token ***//
+// *** Token ***//
 //Fonction qui vérifie localement l'expiration du token
 function tokenValidation(token){
   const payload = tokenExpiration(token);
@@ -24,12 +24,6 @@ function tokenValidation(token){
   }
   return payload
 }
-
-//Suppression du token en cas de click sur logout
-const logSupprToken = document.querySelector(".log");
-logSupprToken.addEventListener("click", function(){
-  token = localStorage.removeItem("token");
-})
 
 function tokenExpiration(token){
   try{
@@ -50,31 +44,15 @@ function tokenExpiration(token){
   }
 }
 
-const tokenVerifie = tokenValidation(token);
+//Suppression du token en cas de click sur logout
+const logSupprToken = document.querySelector(".log");
+logSupprToken.addEventListener("click", function(event){
+  token = localStorage.removeItem("token");
+})
 
-//If qui permet avec la vérification du token l'affichage spécifique
-if (tokenVerifie !== null) {
-  //Transformation du mot login en logout
-  const logModif = document.querySelector(".log");
-  logModif.innerHTML = "logout";
-
-  //Création de la barre mode édition
-  const barreEdition = document.querySelector("body");
-  let divBarreEdition = document.createElement("div");
-  const texteEdition = document.createElement("p");
-  let iconeEdition = document.createElement("i");
-  iconeEdition.classList.add("fa-regular", "fa-pen-to-square", "white");
-  texteEdition.classList.add("white");
-  texteEdition.innerText = "Mode édition";
-  divBarreEdition.classList.add("mode-edition");
-  divBarreEdition = barreEdition.insertBefore(
-    divBarreEdition,
-    document.querySelector("header")
-  );
-  divBarreEdition.appendChild(iconeEdition);
-  divBarreEdition.appendChild(texteEdition);
-  
-  //Bouton modifier
+// *** Contenu générer en cas de présence du token ***//
+//Fonction pour générer bouton modifier
+function boutonModifier(){
   const selectionModifier = document.querySelector("#portfolio");
   const divTitre = document.createElement("div");
   divTitre.classList.add("div-titre")
@@ -90,6 +68,34 @@ if (tokenVerifie !== null) {
   const txtModifier = document.createElement("p");
   txtModifier.innerText = "modifier";
   btnModifier.appendChild(txtModifier);
+}
+
+//Fonction pour générer la barre édition
+function barreEdition(){
+  const barreEdition = document.querySelector("body");
+  let divBarreEdition = document.createElement("div");
+  const texteEdition = document.createElement("p");
+  let iconeEdition = document.createElement("i");
+  iconeEdition.classList.add("fa-regular", "fa-pen-to-square", "white");
+  texteEdition.classList.add("white");
+  texteEdition.innerText = "Mode édition";
+  divBarreEdition.classList.add("mode-edition");
+  divBarreEdition = barreEdition.insertBefore(
+    divBarreEdition,
+    document.querySelector("header")
+  );
+  divBarreEdition.appendChild(iconeEdition);
+  divBarreEdition.appendChild(texteEdition);
+}
+
+const tokenVerifie = tokenValidation(token);
+//If qui permet avec la vérification du token l'affichage spécifique
+if (tokenVerifie !== null) {
+  //Transformation du mot login en logout
+  const logModif = document.querySelector(".log");
+  logModif.innerHTML = "logout";
+  barreEdition();
+  boutonModifier();
 }
 
 //Fonction pour générer l'affichage de tous les projets
@@ -137,7 +143,6 @@ function filtresCategories() {
 //Fonction pour Filtrer les projets
 function filtrerProjets(){
   const btnTri = document.querySelectorAll("div[data-id]");
-
   btnTri.forEach((btn) => {
     btn.addEventListener("click", function(){
       const idProjet = btn.getAttribute("data-id");
@@ -154,15 +159,13 @@ function filtrerProjets(){
   });
 }
 
-//Lancement des fonctions
+//Lancement des fonctions pour la galerie et les filtres en mode  visiteur
 projetsGallery(projets);
-
 filtresCategories(categories);
-
 filtrerProjets();
 
-//Modale
-
+// *** Modale ***//
+//Initialisation de valeurs
 const fondModale = document.querySelector(".fond-modale");
 const modale = document.querySelector(".modale");
 const btnModification = document.querySelector(".div-titre a");
@@ -170,7 +173,7 @@ const ajoutPhoto = document.querySelector(".ajout-photo");
 const depotPhoto = document.getElementById("depot-photo");
 const btnAjoutPhoto = document.querySelector(".envoi");
 
-//Fonction pour générer l'affichage de tous les projets en modale
+//Fonction pour générer l'affichage de tous les projets dans la modale
 function projetsModale(filtre) {
   // Récupération de l'élément DOM qui accueille la figure
   const divProjets = document.querySelector(".galerie-photo");
@@ -220,7 +223,7 @@ function modaleGalerie(){
   }
 }
 
-//Permet l'affichage de la modale
+//Permet l'affichage de la modale au click sur modifier
 btnModification.addEventListener("click", function(event){
   event.preventDefault();
   fondModale.classList.add("active");
@@ -242,7 +245,6 @@ function fermerModale(){
   fleche.classList.remove("visible");
   fondModale.classList.remove("active");
   modale.classList.remove("active");
-  btnAjoutPhoto.classList.add("cacher");
   viderFormulaire();
 }
 
@@ -252,38 +254,6 @@ fondModale.addEventListener("click", fermerModale);
 //Permet le désaffichage de la modale en cliquant sur la croix
 const croixFermer = document.querySelector(".fa-xmark");
 croixFermer.addEventListener("click", fermerModale);
-
-function SupprimerTravaux(){
-  const suppression = document.querySelectorAll(".fa-corbeille");
-  //Récupère pour chaque i fa-corbeille le data id de sa fig
-  suppression.forEach(corbeille => {
-    corbeille.addEventListener("click",async (event)=>{
-      //Remonter l'arbre DOM pour trouver le  parent le plus proche de la corbeille
-      const figSuppression =  event.target.closest("figure");
-      //Récupère le data-id de la figure sélectionnée, ? permet d'éviter une erreur dans le  cas où  il n'y a pas de parent
-      const idSuppression = figSuppression?.getAttribute("data-id");
- 
-      //Envoyer la requêtre DELETE pour supprimer l'élément
-      try{
-        const reponse = await fetch(`http://localhost:5678/api/works/${idSuppression}`, {
-          method: "DELETE",
-          headers: {Authorization: `Bearer ${token}`},
-        });
-        if (reponse.ok){
-          figSuppression.remove();
-          const figGallery = document.querySelector(`.gallery figure[data-id="${idSuppression}"]`);
-          figGallery.remove();
-
-        } else{
-          alert("Travail non supprimé", reponse.statusText, reponse.status);
-        }
-      }
-      catch(error){
-        console.error("Problème rencontré", error);
-      }
-    });
-  });
-}
 
 //Permet le retour en arrière avec la fleche sur la modale
 const flecheRetour = document.querySelector(".fa-arrow-left");
@@ -332,6 +302,40 @@ function viderFormulaire(){
   }
 }
 
+//***Fonction Modifications Travaux ***//
+//Fonction pour supprimer les travaux
+function SupprimerTravaux(){
+  const suppression = document.querySelectorAll(".fa-corbeille");
+  //Récupère pour chaque i fa-corbeille le data id de sa fig
+  suppression.forEach(corbeille => {
+    corbeille.addEventListener("click",async (event)=>{
+      //Remonter l'arbre DOM pour trouver le  parent le plus proche de la corbeille
+      const figSuppression =  event.target.closest("figure");
+      //Récupère le data-id de la figure sélectionnée, ? permet d'éviter une erreur dans le  cas où  il n'y a pas de parent
+      const idSuppression = figSuppression?.getAttribute("data-id");
+ 
+      //Envoyer la requêtre DELETE pour supprimer l'élément
+      try{
+        const reponse = await fetch(`http://localhost:5678/api/works/${idSuppression}`, {
+          method: "DELETE",
+          headers: {Authorization: `Bearer ${token}`},
+        });
+        if (reponse.ok){
+          figSuppression.remove();
+          const figGallery = document.querySelector(`.gallery figure[data-id="${idSuppression}"]`);
+          figGallery.remove();
+
+        } else{
+          alert("Travail non supprimé", reponse.statusText, reponse.status);
+        }
+      }
+      catch(error){
+        console.error("Problème rencontré", error);
+      }
+    });
+  });
+}
+
 //Fonction qui récupère les  informations
 function recupererTravail(){
   //Récupération informations formulaire au click du bouton valider
@@ -358,7 +362,7 @@ function recupererTravail(){
     nouveauTravail.append("category", choixInt);
     return nouveauTravail
   }
-  
+
   //Fonction qui gère l'envoi du travail
   async function envoyerTravail(){
     const nouveauTravail = recupererTravail();
@@ -369,11 +373,20 @@ function recupererTravail(){
             headers: {Authorization: `Bearer ${token}`},
             body: nouveauTravail,
           });
+    if(!reponse.ok){
+      const message = `${reponse.status}: ${reponse.statusText}`;
+      alert(message)
+      return null;
+    }
+    //Réponse en JSON
+    const reponseValide = await reponse.json();
+    //Renvoie la valeur de la réponse
+    return reponseValide;
     }catch(error){
-      alert("Problème rencontré", error);
+      alert("Problème rencontré : "+ error.message);
+      return null;
     }
   };
-
 
 //Passage de  la modale en mode Ajout Photo
 ajoutPhoto.addEventListener("click", function(){
@@ -399,33 +412,32 @@ ajoutPhoto.addEventListener("click", function(){
   verifierFormulaire();
 });
 
+//Fonction pour vérifier la complétion correcte du formulaire
 function verifierFormulaire(){
   const formulaire = document.querySelector(".form-photo");
+  //Déclaration d'une fonction fléchée pour confirmer la validité du formulaire
   const verificationForm = () => {
     const valide = formulaire.checkValidity();
     if(valide){
       btnAjoutPhoto.classList.remove("activation");
-      ajoutPhoto.classList.add("envoi");
     } else{
       btnAjoutPhoto.classList.add("activation");
     }
   };
   formulaire.addEventListener("input",verificationForm);
+  //Vérification initiale
   verificationForm();
 }
-
 
 //Afficher l'image ajoutée en input
 depotPhoto.addEventListener("change", function (event) {
   //Récupérer l'image envoyée
   const photoAjoutee = event.target;
   const photo = photoAjoutee.files[0];
-
   if (photo) {
     // Crée une URL temporaire pour le fichier
     const photoURL = URL.createObjectURL(photo); 
     const imageAffichage = document.querySelector(".affichage-photo");
-
     // Cache les différents éléments
     const faImage = document.querySelector(".fa-image");
     const labelSpan = document.querySelector(".zone-depot span");
@@ -433,11 +445,9 @@ depotPhoto.addEventListener("change", function (event) {
     faImage.classList.add("cacher");
     labelSpan.classList.add("cacher");
     labelP.classList.add("cacher");
-
     //Ajout d'une source à l'image
     imageAffichage.classList.remove("cacher");
     imageAffichage.src = photoURL;
-
     // Libère l'URL temporaire lorsque l'image n'est plus nécessaire
     imageAffichage.onload = () => URL.revokeObjectURL(photoURL);
   } else {
@@ -455,9 +465,11 @@ depotPhoto.addEventListener("change", function (event) {
 });
 
 //*** Envoi des informations à  l'API ***//
-btnAjoutPhoto.addEventListener("click", function(event){
+btnAjoutPhoto.addEventListener("click",async function(event){
   event.preventDefault();
-  envoyerTravail();
+  const reponse = await envoyerTravail();
+  if (reponse){
+    projetsGallery(projets);
+  }
   fermerModale();
-  projetsGallery(projets);
 })

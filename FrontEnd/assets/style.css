@@ -88,8 +88,8 @@ header li{
 }
 
 header li img{
-	width: 22px;
-	height: 22px;
+	width: 19.35px;
+	height: 19.35px;
 	
 }
 
@@ -104,7 +104,7 @@ h1{
 	font-size: 22px;
 	font-weight: 800;
 	color: #B1663C;
-	gap: 10px;
+	gap: 5px;
 }
 
 h1 > span {
@@ -132,7 +132,7 @@ nav li {
 	font-size: 1.2em;
 }
 
-li:hover {
+header li:hover {
 	color: #B1663C;
 }
 #introduction {
@@ -196,7 +196,11 @@ form {
 	margin-top:30px;
 	display: flex;
 	flex-direction: column;
-	align-items: center;
+	align-items: flex-start;
+}
+
+#formulaire-connexion{
+	margin: 0;
 }
 
 #name, #email, #pwd{
@@ -207,7 +211,7 @@ form {
 	box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
 }
 label {
-	margin: 2em 0 1em 0;
+	margin: 2em 0 0.5em 0;
 }
  textarea {
 	width: 379px;
@@ -231,6 +235,11 @@ label {
 	border-radius: 60px ;
 	border: none;
 	box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
+}
+
+.tableau-connexion input[type="submit"]{
+	margin: 3em 0;
+	align-self: center;
 }
 
 footer nav ul {
@@ -260,8 +269,9 @@ footer, .mode-edition{
 	display: flex;
 	flex-direction: row;
 	justify-content: center;
-	margin-top: 50px;
-	gap: 30px;
+	margin-top: 40px;
+	margin-bottom: -1em;
+	gap: 10px;
 }
 
 #portfolio nav div{
@@ -287,6 +297,7 @@ figcaption {
 	font-family: 'Work Sans' ;
 	font-size: 13px;
 	font-weight: 400;
+	margin-top: 0.5em;
 }
 
 header a {
@@ -302,8 +313,6 @@ header a {
 .tableau-connexion {
 	display: flex;
 	flex-direction: column;
-	width: 50%;
-	margin: auto;
 }
 
 .tableau-connexion > * {
@@ -345,7 +354,7 @@ header a {
 	flex-direction: row;
 	align-items: center;
 	justify-content: center;
-	gap: 10px;
+	gap: 30px;
 }
 
 .div-titre a{
@@ -358,7 +367,6 @@ header a {
 }
 
 /*Ajout de la modale*/
-
 /*Gestion affichage de la modale*/
 .fond-modale{
 	display: none;
@@ -376,7 +384,7 @@ header a {
 	height: 688px;
 	position: absolute;
 	top: 85%;
-	left: 35%;
+	left: 30%;
 	background-color: white;
 	flex-direction: column;
 	justify-content: center;
@@ -393,7 +401,8 @@ header a {
 	flex-direction: row;
 	width: 560px;
 	justify-content: space-between;
-	margin-top: -50px;
+	margin-top: -30px;
+	margin-bottom: 1em;
 }
 
 h3{
@@ -416,9 +425,9 @@ h3{
 	flex-wrap: wrap;
 	width: 420px;
 	column-gap: 10px;
-	row-gap: 30px;
-	margin-top: 50px;
-	margin-bottom: 30px;
+	row-gap: 10px;
+	margin-top: 3em;
+	margin-bottom: 3em;
 	padding-bottom: 30px;
 	border-bottom: solid #B3B3B3 1px;
 }
@@ -529,7 +538,7 @@ h3{
 }
 
 .form-photo label{
-	margin: 1em 0 0.5em 0;
+	margin: 1.5em 0 0.5em 0;
 	font-weight: 500;
 }
 
