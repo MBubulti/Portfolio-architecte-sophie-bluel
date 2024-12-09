@@ -260,7 +260,7 @@ footer, .mode-edition{
 	width: 1440px;
 } 
 
-/*Personnalisation nav*/
+/*Personnalisation nav portfolio*/
 #portfolio{
 	width: 950px;
 }
@@ -560,11 +560,13 @@ h3{
 	box-shadow: 0px 4px 14px rgba(0, 0, 0, 0.09);
 }
 
+/*Désactiver un élément*/
 .activation{
 	background-color: #A7A7A7;
 	cursor: not-allowed;
 }
 
+/*Cacher un élément*/
 .cacher{
 	display: none;
 }
@@ -574,6 +576,7 @@ h3{
 	visibility: hidden;
 }
 
+/*Rendre visible un élément*/
 .visible{
 	visibility: visible;
 }

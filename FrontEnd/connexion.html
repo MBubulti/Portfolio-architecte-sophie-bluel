@@ -11,7 +11,7 @@
       rel="stylesheet">
     <meta name="description" content="">
     <link rel="stylesheet" href="./assets/style.css">
-    <script type="module" src="fonctions.js" defer></script>
+    <script type="module" src="connexion-script.js" defer></script>
   </head>
   <body>
     <header>
@@ -30,9 +30,9 @@
             <h2>Log In</h2>
             <form action="#" method="post" id="formulaire-connexion">
                 <label for="email">Email</label>
-                <input type="email" name="email" id="email">
+                <input type="email" name="email" id="email" required>
                 <label for="pwd">Mot de Passe</label>
-                <input type="password" name="pwd" id="pwd">
+                <input type="password" name="pwd" id="pwd" required>
                 <input type="submit" value="Se connecter">
             </form>
             <a href="#">Mot de passe oublié</a>

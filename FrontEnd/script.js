@@ -16,16 +16,8 @@ categories.sort(function (a, b) {
 });
 
 // *** Token ***//
-//Fonction qui vérifie localement l'expiration du token
-function tokenValidation(token){
-  const payload = tokenExpiration(token);
-  if(!payload){
-    return null;
-  }
-  return payload
-}
-
-function tokenExpiration(token){
+//Fonction pour vérifier le token
+function IsTokenValide(token){
   try{
       //Découpe du token en 3 élément, et sélection du payload
     const tokenPayload = token.split(".")[1];
@@ -34,13 +26,13 @@ function tokenExpiration(token){
     const temps = Math.floor(Date.now()/1000);
     //Vérification du payload par rapport au temps
     if(payload.exp && payload.exp < temps){
-      return null;
+      return false;
     }
-    return payload;
+    return true;
   }
   //En cas d'erreur dans la vérification du token retourne un null
   catch(error){
-    return null;
+    return false;
   }
 }
 
@@ -51,7 +43,7 @@ logSupprToken.addEventListener("click", function(event){
 })
 
 // *** Contenu générer en cas de présence du token ***//
-//Fonction pour générer bouton modifier
+//Fonction pour générer le bouton modifier
 function boutonModifier(){
   const selectionModifier = document.querySelector("#portfolio");
   const divTitre = document.createElement("div");
@@ -88,9 +80,8 @@ function barreEdition(){
   divBarreEdition.appendChild(texteEdition);
 }
 
-const tokenVerifie = tokenValidation(token);
 //If qui permet avec la vérification du token l'affichage spécifique
-if (tokenVerifie !== null) {
+if (IsTokenValide(token) === true) {
   //Transformation du mot login en logout
   const logModif = document.querySelector(".log");
   logModif.innerHTML = "logout";
@@ -122,7 +113,7 @@ function projetsGallery(filtre) {
 //Fonction pour générer les boutons filtres de tous les projets
 function filtresCategories() {
   //Permet de ne pas générer les filtres si on a un token Vérifié
-  if (tokenVerifie !== null){
+  if (IsTokenValide(token) === true){
     return;
   }
   const filtresNav = document.createElement("nav");
@@ -146,7 +137,6 @@ function filtrerProjets(){
   btnTri.forEach((btn) => {
     btn.addEventListener("click", function(){
       const idProjet = btn.getAttribute("data-id");
-
       let projetFiltre;
       if (idProjet === "0") {
         projetFiltre = projets
@@ -174,12 +164,12 @@ const depotPhoto = document.getElementById("depot-photo");
 const btnAjoutPhoto = document.querySelector(".envoi");
 
 //Fonction pour générer l'affichage de tous les projets dans la modale
-function projetsModale(filtre) {
+function projetsModale(projet) {
   // Récupération de l'élément DOM qui accueille la figure
   const divProjets = document.querySelector(".galerie-photo");
   divProjets.innerHTML = "";
-  for (let i = 0; i < filtre.length; i++) {
-    const travaux = filtre[i];
+  for (let i = 0; i < projet.length; i++) {
+    const travaux = projet[i];
     // Création d'une figure dédiée aux projets
     const figuresProjet = document.createElement("figure");
     figuresProjet.dataset.id = travaux.id;
@@ -313,9 +303,10 @@ function SupprimerTravaux(){
       const figSuppression =  event.target.closest("figure");
       //Récupère le data-id de la figure sélectionnée, ? permet d'éviter une erreur dans le  cas où  il n'y a pas de parent
       const idSuppression = figSuppression?.getAttribute("data-id");
- 
-      //Envoyer la requêtre DELETE pour supprimer l'élément
-      try{
+      //Vérification du token avant de lancer le try/catch
+      if (IsTokenValide(token) === true){
+        //Envoyer la requêtre DELETE pour supprimer l'élément
+        try{
         const reponse = await fetch(`http://localhost:5678/api/works/${idSuppression}`, {
           method: "DELETE",
           headers: {Authorization: `Bearer ${token}`},
@@ -328,51 +319,53 @@ function SupprimerTravaux(){
         } else{
           alert("Travail non supprimé", reponse.statusText, reponse.status);
         }
-      }
-      catch(error){
+        }
+        catch(error){
         console.error("Problème rencontré", error);
+        }
       }
-    });
+    });   
   });
 }
 
 //Fonction qui récupère les  informations
 function recupererTravail(){
-  //Récupération informations formulaire au click du bouton valider
-    //Récupération PHOTO
-    let photo = document.getElementById("depot-photo").files[0];
-    //Récupération TITRE
-    const titre = document.querySelector("#titre-travail");
-    const titreEnvoyer = titre.value.trim();
-    if (titreEnvoyer === "") {
-      alert("Votre titre n'est pas valide");
-    }
-    //Récupération SELECT
-    const selectChoix = document.getElementById("categorie");
-    //Récupérer l'index du select
-    const choixIndex = selectChoix.selectedIndex;
-    //Attribution value option choisie
-    const choix = selectChoix.options[choixIndex].value;
-    const choixInt = parseInt(choix, 10);
-
-    //Déclaration du FormData pour  envoi à l'API
-    const nouveauTravail = new FormData();
-    nouveauTravail.append("image", photo);
-    nouveauTravail.append("title", titreEnvoyer);
-    nouveauTravail.append("category", choixInt);
-    return nouveauTravail
+//Récupération informations formulaire au click du bouton valider
+  //Récupération PHOTO
+  let photo = document.getElementById("depot-photo").files[0];
+  //Récupération TITRE
+  const titre = document.querySelector("#titre-travail");
+  const titreEnvoyer = titre.value.trim();
+  if (titreEnvoyer === "") {
+    alert("Votre titre n'est pas valide");
   }
+  //Récupération SELECT
+  const selectChoix = document.getElementById("categorie");
+  //Récupérer l'index du select
+  const choixIndex = selectChoix.selectedIndex;
+  //Attribution value option choisie
+  const choix = selectChoix.options[choixIndex].value;
+  const choixInt = parseInt(choix, 10);
 
-  //Fonction qui gère l'envoi du travail
-  async function envoyerTravail(){
-    const nouveauTravail = recupererTravail();
+  //Déclaration du FormData pour  envoi à l'API
+  const nouveauTravail = new FormData();
+  nouveauTravail.append("image", photo);
+  nouveauTravail.append("title", titreEnvoyer);
+  nouveauTravail.append("category", choixInt);
+  return nouveauTravail
+}
+
+//Fonction qui gère l'envoi du travail
+async function envoyerTravail(){
+  const nouveauTravail = recupererTravail();
+  if(IsTokenValide(token) === true){
     //Envoi via Fetch API
     try{
     const reponse = await fetch("http://localhost:5678/api/works/", {
-            method: "POST",
-            headers: {Authorization: `Bearer ${token}`},
-            body: nouveauTravail,
-          });
+          method: "POST",
+          headers: {Authorization: `Bearer ${token}`},
+          body: nouveauTravail,
+        });
     if(!reponse.ok){
       const message = `${reponse.status}: ${reponse.statusText}`;
       alert(message)
@@ -386,7 +379,8 @@ function recupererTravail(){
       alert("Problème rencontré : "+ error.message);
       return null;
     }
-  };
+  }
+};
 
 //Passage de  la modale en mode Ajout Photo
 ajoutPhoto.addEventListener("click", function(){
@@ -469,7 +463,15 @@ btnAjoutPhoto.addEventListener("click",async function(event){
   event.preventDefault();
   const reponse = await envoyerTravail();
   if (reponse){
-    projetsGallery(projets);
+    const nvlFigure = document.createElement("figure");
+    nvlFigure.dataset.id = reponse.id;
+    const nvlImg = document.createElement("img");
+    nvlImg.src = reponse.imageUrl;
+    const  nvTitre = document.createElement("figcaption");
+    nvTitre.innerText = reponse.title;
+    document.querySelector(".gallery").appendChild(nvlFigure);
+    nvlFigure.appendChild(nvlImg);
+    nvlFigure.appendChild(nvTitre);
   }
   fermerModale();
 })
