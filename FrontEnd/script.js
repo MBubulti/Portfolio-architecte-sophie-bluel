@@ -1,6 +1,6 @@
 //Appel des différents Projets
-const appelApiProjets = await fetch("http://localhost:5678/api/works/");
-const projets = await appelApiProjets.json();
+let appelApiProjets = await fetch("http://localhost:5678/api/works/");
+let projets = await appelApiProjets.json();
 
 //Appel des différentes Catégories pour les filtres
 const appelApiCategories = await fetch("http://localhost:5678/api/categories/");
@@ -214,7 +214,7 @@ function modaleGalerie(){
 }
 
 //Permet l'affichage de la modale au click sur modifier
-btnModification.addEventListener("click", function(event){
+btnModification.addEventListener("click", async function(event){
   event.preventDefault();
   fondModale.classList.add("active");
   modale.classList.add("active");
@@ -260,6 +260,7 @@ flecheRetour.addEventListener("click", function(){
   btnAjoutPhoto.classList.remove("activation");
   btnAjoutPhoto.classList.add("cacher")
   ajoutPhoto.classList.remove("cacher");
+  viderFormulaire();
 });
 
 //Fonction pour ajouter en option les catégories
@@ -315,7 +316,8 @@ function SupprimerTravaux(){
           figSuppression.remove();
           const figGallery = document.querySelector(`.gallery figure[data-id="${idSuppression}"]`);
           figGallery.remove();
-
+          appelApiProjets = await fetch("http://localhost:5678/api/works/");
+          projets = await appelApiProjets.json();
         } else{
           alert("Travail non supprimé", reponse.statusText, reponse.status);
         }
@@ -323,6 +325,8 @@ function SupprimerTravaux(){
         catch(error){
         console.error("Problème rencontré", error);
         }
+        appelApiProjets = await fetch("http://localhost:5678/api/works/");
+        projets = await appelApiProjets.json();
       }
     });   
   });
@@ -423,11 +427,23 @@ function verifierFormulaire(){
   verificationForm();
 }
 
+function verifierTaillePhoto(photo){
+  const tailleMaximaleMB = 4; // Taille maximale en mégaoctets
+  const tailleMaximaleO = tailleMaximaleMB * 1024 * 1024;
+  if (photo && photo.size > tailleMaximaleO) {
+    alert("Taille de photo supérieur à 4 Mo")
+    imageInput.value = ''; // Réinitialise l'input
+    }
+};
+
 //Afficher l'image ajoutée en input
 depotPhoto.addEventListener("change", function (event) {
   //Récupérer l'image envoyée
   const photoAjoutee = event.target;
   const photo = photoAjoutee.files[0];
+  if(!verifierTaillePhoto(photo)){
+    return;
+  }
   if (photo) {
     // Crée une URL temporaire pour le fichier
     const photoURL = URL.createObjectURL(photo); 
@@ -473,5 +489,7 @@ btnAjoutPhoto.addEventListener("click",async function(event){
     nvlFigure.appendChild(nvlImg);
     nvlFigure.appendChild(nvTitre);
   }
+  appelApiProjets = await fetch("http://localhost:5678/api/works/");
+  projets = await appelApiProjets.json();
   fermerModale();
 })
