@@ -427,13 +427,14 @@ function verifierFormulaire(){
   verificationForm();
 }
 
-function verifierTaillePhoto(photo){
+function verifierTaillePhoto(photo,  inputElement){
   const tailleMaximaleMB = 4; // Taille maximale en mégaoctets
   const tailleMaximaleO = tailleMaximaleMB * 1024 * 1024;
   if (photo && photo.size > tailleMaximaleO) {
     alert("Taille de photo supérieur à 4 Mo")
-    imageInput.value = ''; // Réinitialise l'input
-    }
+    inputElement.value = ''; // Réinitialise l'input
+    return false;
+  } return true;
 };
 
 //Afficher l'image ajoutée en input
@@ -441,17 +442,17 @@ depotPhoto.addEventListener("change", function (event) {
   //Récupérer l'image envoyée
   const photoAjoutee = event.target;
   const photo = photoAjoutee.files[0];
-  if(!verifierTaillePhoto(photo)){
+  const imageAffichage = document.querySelector(".affichage-photo");
+  if(!verifierTaillePhoto(photo, photoAjoutee)){
     return;
   }
+  const faImage = document.querySelector(".fa-image");
+  const labelSpan = document.querySelector(".zone-depot span");
+  const labelP = document.querySelector(".zone-depot p");
   if (photo) {
     // Crée une URL temporaire pour le fichier
     const photoURL = URL.createObjectURL(photo); 
-    const imageAffichage = document.querySelector(".affichage-photo");
     // Cache les différents éléments
-    const faImage = document.querySelector(".fa-image");
-    const labelSpan = document.querySelector(".zone-depot span");
-    const labelP = document.querySelector(".zone-depot p");
     faImage.classList.add("cacher");
     labelSpan.classList.add("cacher");
     labelP.classList.add("cacher");
@@ -463,11 +464,7 @@ depotPhoto.addEventListener("change", function (event) {
   } else {
     // Si aucun fichier sélectionné, on cache l'image
     imageAffichage.classList.add("cacher");
-    const imageAffichage = document.querySelector(".affichage-photo");
     imageAffichage.src = "";
-    const faImage = document.querySelector(".fa-image");
-    const labelSpan = document.querySelector(".zone-depot span");
-    const labelP = document.querySelector(".zone-depot p");
     faImage.classList.remove("cacher");
     labelSpan.classList.remove("cacher");
     labelP.classList.remove("cacher");
